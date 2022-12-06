@@ -20,27 +20,28 @@ def get_position(symbol):
     return 0
 
 
-SYMBOL = 'AAPL'
+SYMBOLS = ["BTCUSD", "ETHUSD"]
 while True:
-    # GET OUR CURRENT POSITION
-    position = get_position(symbol=SYMBOL)
+    for ticker in SYMBOLS:
+        # GET OUR CURRENT POSITION
+        position = get_position(symbol=ticker)
 
-    # SCIENTIFICALLY CHECK IF WE SHOULD BUY OR SELL
-    gods_say_buy = random.choice([True, False])
-    print(f"Holding: {position} / Gods: {gods_say_buy}")
+        # SCIENTIFICALLY CHECK IF WE SHOULD BUY OR SELL
+        gods_say_buy = random.choice([True, False])
+        print(f"Holding: {position} / Gods: {gods_say_buy}")
 
-    # CHECK IF WE SHOULD BUY
-    if position == 0 and gods_say_buy == True:
-        # WE BUY ONE BITCOIN
-        print('The gods have spoken:')
-        print(f'Symbol: {SYMBOL} / Side: BUY / Quantity: 1')
-        api.submit_order(SYMBOL, qty=1, side='buy', time_in_force='gtc')
-    # HECK IF WE SHOULD SELL
-    elif position > 0 and gods_say_buy == False:
-        # WE SELL ONE BITCOIN
-        print('The gods have spoken:')
-        print(f'Symbol: {SYMBOL} / Side: SELL / Quantity: 1')
-        api.submit_order(SYMBOL, qty=1, side='sell', time_in_force='gtc')
-    print('Lets wait for the gods to manifest again...')
+        # CHECK IF WE SHOULD BUY
+        if position == 0 and gods_say_buy == True:
+            # WE BUY ONE BITCOIN
+            print('The gods have spoken:')
+            print(f'Symbol: {ticker} / Side: BUY / Quantity: 1')
+            api.submit_order(ticker, qty=1, side='buy', time_in_force='gtc')
+        # HECK IF WE SHOULD SELL
+        elif position > 0 and gods_say_buy == False:
+            # WE SELL ONE BITCOIN
+            print('The gods have spoken:')
+            print(f'Symbol: {ticker} / Side: SELL / Quantity: 1')
+            api.submit_order(ticker, qty=1, side='sell', time_in_force='gtc')
+        print('Lets wait for the gods to manifest again...')
     print("*"*20)
     time.sleep(2)

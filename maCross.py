@@ -6,13 +6,13 @@ import time
 import random
 
 BASE_URL = "https://paper-api.alpaca.markets"
-KEY_ID = "PK9E89NTGNYF6G7O5WX2"
-SECRET_KEY = "8Y3O1kTiIQ8IrvoUhtybhBeod5CkXWpypphFw6Gk"
+KEY_ID = "PK9GDJPUBRJVGQFYIDXW"
+SECRET_KEY = "x7O11GYCcuJfxfps2jxeOh9PWxGxeFWEczLA4Rkw"
 api = REST(key_id=KEY_ID, secret_key=SECRET_KEY,
            base_url="https://paper-api.alpaca.markets")
 
 
-SYMBOL = "BTCUSD"
+SYMBOLS = ["BTCUSD", "ETHUSD"]
 SMA_FAST = 12
 SMA_SLOW = 24
 QTY_PER_TRADE = 1
@@ -69,22 +69,23 @@ def get_bars(symbol):
 
 
 while True:
-    # GET DATA
-    bars = get_bars(symbol=SYMBOL)
-    # CHECK POSITIONS
-    position = get_position(symbol=SYMBOL)
-    should_buy = get_signal(bars.sma_fast, bars.sma_slow)
-    print(f"Position: {position} / Should Buy: {should_buy}")
-    if position == 0 and should_buy == True:
-        # WE BUY ONE BITCOIN
-        api.submit_order(SYMBOL, qty=QTY_PER_TRADE,
-                         side='buy', time_in_force='gtc')
-        print(f'Symbol: {SYMBOL} / Side: BUY / Quantity: {QTY_PER_TRADE}')
-    elif position > 0 and should_buy == False:
-        # WE SELL ONE BITCOIN
-        api.submit_order(SYMBOL, qty=QTY_PER_TRADE,
-                         side='sell', time_in_force='gtc')
-        print(f'Symbol: {SYMBOL} / Side: SELL / Quantity: {QTY_PER_TRADE}')
+    for ticker in SYMBOLS:
+        # GET DATA
+        bars = get_bars(symbol=ticker)
+        # CHECK POSITIONS
+        position = get_position(symbol=ticker)
+        should_buy = get_signal(bars.sma_fast, bars.sma_slow)
+        print(f"Position: {position} / Should Buy: {should_buy}")
+        if position == 0 and should_buy == True:
+            # WE BUY ONE BITCOIN
+            api.submit_order(ticker, qty=QTY_PER_TRADE,
+                             side='buy', time_in_force='gtc')
+            print(f'Symbol: {ticker} / Side: BUY / Quantity: {QTY_PER_TRADE}')
+        elif position > 0 and should_buy == False:
+            # WE SELL ONE BITCOIN
+            api.submit_order(ticker, qty=QTY_PER_TRADE,
+                             side='sell', time_in_force='gtc')
+            print(f'Symbol: {ticker} / Side: SELL / Quantity: {QTY_PER_TRADE}')
 
     time.sleep(get_pause())
     print("*"*20)
