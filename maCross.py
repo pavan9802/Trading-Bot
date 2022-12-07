@@ -85,7 +85,7 @@ while True:
             print(f'Symbol: {ticker} / Side: BUY / Quantity: {notionalQTY}')
         elif position > 0 and should_buy == False:
             # WE SELL ONE BITCOIN
-            api.submit_order(ticker, notional=notionalQTY,
+            api.submit_order(ticker, notional=position,
                              side='sell', time_in_force='gtc')
             print(f'Symbol: {ticker} / Side: SELL / Quantity: {position}')
 
