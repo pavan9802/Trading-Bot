@@ -13,9 +13,10 @@ api = REST(key_id=KEY_ID, secret_key=SECRET_KEY,
 
 
 SYMBOLS = ["BTCUSD", "ETHUSD"]
+# SYMBOLS = ["AAPL", "MSFT", "GOOG", "AMZN", "TSLA", "JNJ", "V", "WMT", "JPM",
+#            "NVDA", "MA", "META", "BAC", "CSCO", "SHEL", "ORCL", "MCD", "UPS", "MS", "NFLX", "QCOM", "GS"]
 SMA_FAST = 12
 SMA_SLOW = 24
-QTY_PER_TRADE = 1
 
 
 def get_position(symbol):
@@ -70,6 +71,7 @@ def get_bars(symbol):
 
 while True:
     for ticker in SYMBOLS:
+        notionalQTY = float(api.get_account().buying_power) * 0.05
         # GET DATA
         bars = get_bars(symbol=ticker)
         # CHECK POSITIONS
@@ -78,14 +80,14 @@ while True:
         print(f"Position: {position} / Should Buy: {should_buy}")
         if position == 0 and should_buy == True:
             # WE BUY ONE BITCOIN
-            api.submit_order(ticker, qty=QTY_PER_TRADE,
+            api.submit_order(ticker, notional=notionalQTY,
                              side='buy', time_in_force='gtc')
-            print(f'Symbol: {ticker} / Side: BUY / Quantity: {QTY_PER_TRADE}')
+            print(f'Symbol: {ticker} / Side: BUY / Quantity: {notionalQTY}')
         elif position > 0 and should_buy == False:
             # WE SELL ONE BITCOIN
-            api.submit_order(ticker, qty=QTY_PER_TRADE,
+            api.submit_order(ticker, notional=notionalQTY,
                              side='sell', time_in_force='gtc')
-            print(f'Symbol: {ticker} / Side: SELL / Quantity: {QTY_PER_TRADE}')
+            print(f'Symbol: {ticker} / Side: SELL / Quantity: {position}')
 
     time.sleep(get_pause())
     print("*"*20)
