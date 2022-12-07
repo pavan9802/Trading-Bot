@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 import math
 import time
 import random
+import threading
 
 BASE_URL = "https://paper-api.alpaca.markets"
 KEY_ID = "PK9GDJPUBRJVGQFYIDXW"
@@ -35,6 +36,26 @@ def get_insideBar(bars):
     return bars.high[-2] > bars.high[-2] and bars.low[-1] > bars.low[-1]
 
 
+def buy(ticker, bars):
+    while True:
+        quotes = api.get_quotes("AAPL", "2021-06-08",
+                                "2021-06-08", limit=10).df
+        avg = quotes.ask.rolling(10).mean()
+        avg = round(avg, 2)
+        if (avg > bars.high[-1]):
+            notionalQTY = float(api.get_account().buying_power) * 0.05
+            api.submit_order(ticker, notional=notionalQTY,
+                             side='buy', time_in_force='gtc', trail_percent="2",
+                             stop_loss=dict(
+                                 stop_price=str(bars.low[-2]),
+                                 limit_price=str(bars.low[-2])
+                             ))
+            print(f'Symbol: {ticker} / Side: BUY / Quantity: {notionalQTY}')
+
+            return
+        time.sleep(5)
+
+
 while True:
     for ticker in SYMBOLS:
         notionalQTY = float(api.get_account().buying_power) * 0.05
@@ -45,15 +66,8 @@ while True:
         position = get_position(symbol=ticker)
         # CHECK POSITIONS
         if position == 0 and should_buy == True:
-            # WE BUY ONE BITCOIN
-            print
-            api.submit_order(ticker, notional=notionalQTY,
-                             side='buy', time_in_force='gtc', trail_percent="2",
-                             stop_loss=dict(
-                                 stop_price=str(bars.low[-2]),
-                                 limit_price=str(bars.low[-2])
-                             ))
-            print(f'Symbol: {ticker} / Side: BUY / Quantity: {notionalQTY}')
+            # Start a thread
+            t1 = threading.Thread(target=buy, args=(ticker, bars))
 
     time.sleep(get_pause())
     print("*"*20)
